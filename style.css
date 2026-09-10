@@ -1,0 +1,613 @@
+:root {
+  --bg-0: #060912;
+  --bg-1: #0E1424;
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-hi: rgba(255, 255, 255, 0.1);
+  --stroke: rgba(255, 255, 255, 0.1);
+  --stroke-hi: rgba(255, 255, 255, 0.18);
+  --text: #EDF1FA;
+  --muted: #8A97B4;
+  --pink: #FF4D6D;
+  --violet: #A855F7;
+  --cyan: #22D3EE;
+  --gold: #FFD166;
+  --grad: linear-gradient(135deg, #FF4D6D 0%, #A855F7 100%);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(900px 620px at 15% -12%, #22305A 0%, transparent 62%),
+    radial-gradient(760px 560px at 105% 108%, #3E1B52 0%, transparent 58%),
+    var(--bg-0);
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  height: 100vh;
+  max-height: 620px;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid var(--stroke);
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ===== МЕНЮ ===== */
+#menu-screen {
+  padding: 28px 24px;
+  gap: 22px;
+  background:
+    radial-gradient(620px 380px at 50% -8%, rgba(168, 85, 247, 0.18) 0%, transparent 70%),
+    radial-gradient(520px 340px at 50% 110%, rgba(255, 77, 109, 0.14) 0%, transparent 70%);
+}
+
+.menu-header {
+  text-align: center;
+}
+
+.yana-avatar {
+  width: 92px;
+  height: 92px;
+  padding: 3px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  background: var(--grad);
+  box-shadow: 0 12px 34px rgba(168, 85, 247, 0.35);
+}
+
+.yana-avatar.small {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 14px;
+}
+
+.yana-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--bg-0);
+  display: block;
+}
+
+.menu-header h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(30px, 6vw, 44px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  background: linear-gradient(120deg, #FFFFFF 10%, #FFB3C1 45%, #C4A0FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.route {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 680px;
+}
+
+.route-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 7px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.route-step i {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--grad);
+  color: #fff;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.route-arrow {
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 14px;
+}
+
+/* ===== КНОПКИ ===== */
+.btn-primary,
+.btn-secondary {
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.btn-primary {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(255, 77, 109, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(255, 77, 109, 0.42);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--stroke);
+  color: var(--muted);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hi);
+  color: var(--text);
+}
+
+.btn-start {
+  font-size: 16px;
+  padding: 15px 34px;
+}
+
+.controls {
+  text-align: center;
+  padding: 16px 22px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2.1;
+  max-width: 480px;
+}
+
+.controls-meta {
+  font-size: 12px;
+  color: rgba(138, 151, 180, 0.75);
+  line-height: 1.9;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 24px;
+  padding: 2px 8px;
+  margin: 0 1px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom-width: 2px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ===== ИГРА ===== */
+#game-screen {
+  background: #0A0E18;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 5;
+  pointer-events: none;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--grad);
+  box-shadow: 0 0 12px rgba(255, 77, 109, 0.6);
+  transition: width 0.12s linear;
+}
+
+#hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  padding-right: 78px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(8, 12, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #fff;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+#lives {
+  letter-spacing: 2px;
+  padding: 6px 11px;
+}
+
+#lives .on {
+  color: #FF5C7A;
+}
+
+#lives .off {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+#shield {
+  color: var(--cyan);
+  border-color: rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.14);
+}
+
+#shield[hidden] {
+  display: none;
+}
+
+#cookies {
+  margin-left: auto;
+  color: var(--gold);
+}
+
+#back-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.18s ease;
+}
+
+#back-btn:hover {
+  background: rgba(255, 77, 109, 0.7);
+}
+
+/* ===== ОВЕРЛЕИ ===== */
+.overlay {
+  background: rgba(6, 9, 18, 0.72);
+  backdrop-filter: blur(12px) saturate(1.15);
+  z-index: 20;
+}
+
+.overlay-box {
+  width: 90%;
+  max-width: 400px;
+  padding: 30px 30px 26px;
+  text-align: center;
+  border-radius: 22px;
+  border: 1px solid var(--stroke-hi);
+  background: linear-gradient(180deg, rgba(30, 39, 64, 0.96) 0%, rgba(13, 18, 32, 0.96) 100%);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.badge {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #D8BBFF;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge.danger {
+  background: rgba(255, 77, 109, 0.14);
+  border-color: rgba(255, 77, 109, 0.4);
+  color: #FFB3C1;
+}
+
+.badge.gold {
+  background: rgba(255, 209, 102, 0.14);
+  border-color: rgba(255, 209, 102, 0.42);
+  color: var(--gold);
+}
+
+.overlay-box h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 12px;
+  background: linear-gradient(120deg, #FFFFFF 15%, #FFC2CE 60%, #C9A8FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.overlay-box p {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.overlay-box p b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+#final-stats {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.overlay-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ===== МОБИЛЬНЫЕ ===== */
+@media (max-width: 560px) {
+  #app {
+    border: none;
+    border-radius: 0;
+    max-height: 100vh;
+    box-shadow: none;
+  }
+
+  #menu-screen {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .yana-avatar {
+    width: 74px;
+    height: 74px;
+    margin-bottom: 12px;
+  }
+
+  .route {
+    gap: 6px;
+  }
+
+  .route-step {
+    font-size: 12px;
+    padding: 6px 11px 6px 6px;
+  }
+
+  .route-arrow {
+    display: none;
+  }
+
+  .controls {
+    line-height: 1.9;
+    font-size: 12px;
+    padding: 12px 16px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
+
+/* ===== КНОПКА ЗВУКА ===== */
+#sound-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 40;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 22, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+}
+
+#sound-btn:hover {
+  background: rgba(168, 85, 247, 0.55);
+  transform: translateY(-2px);
+}
+
+#sound-btn.muted {
+  opacity: 0.55;
+}
+
+/* ===== ФОН СТРАНИЦЫ: ФОТО ЯНЫ В КРУЖОЧКАХ ВОКРУГ ИГРЫ ===== */
+#page-photos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pp {
+  position: absolute;
+  border-radius: 50%;
+  background-image: url('assets/yana-photo.png');
+  background-size: cover;
+  background-position: center 30%;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.16),
+    0 0 0 6px rgba(168, 85, 247, 0.22),
+    0 20px 46px rgba(0, 0, 0, 0.55);
+  animation: pp-float 15s ease-in-out infinite;
+}
+
+@keyframes pp-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-18px) rotate(3deg); }
+}
+
+/* Дальний план — мельче, глуше и слегка размыт */
+.pp1  { left: 4%;  top: 11%; width: clamp(58px, 7.5vw, 112px); aspect-ratio: 1; opacity: .8;  animation-duration: 15s; animation-delay: -1s; }
+.pp2  { left: 12%; top: 45%; width: clamp(44px, 5vw, 74px);    aspect-ratio: 1; opacity: .5;  filter: blur(1px); animation-duration: 19s; animation-delay: -6s; }
+.pp3  { left: 3%;  top: 72%; width: clamp(52px, 6.5vw, 96px);  aspect-ratio: 1; opacity: .72; animation-duration: 17s; animation-delay: -3s; }
+.pp4  { left: 20%; top: 87%; width: clamp(38px, 4vw, 60px);    aspect-ratio: 1; opacity: .45; filter: blur(1px); animation-duration: 21s; animation-delay: -9s; }
+.pp5  { right: 5%; top: 8%;  width: clamp(48px, 5.5vw, 86px);  aspect-ratio: 1; opacity: .68; animation-duration: 16s; animation-delay: -4s; }
+.pp6  { right: 11%; top: 40%; width: clamp(58px, 7.5vw, 114px); aspect-ratio: 1; opacity: .8;  animation-duration: 14s; animation-delay: -8s; }
+.pp7  { right: 4%; top: 71%; width: clamp(42px, 4.8vw, 70px);  aspect-ratio: 1; opacity: .52; filter: blur(1px); animation-duration: 20s; animation-delay: -2s; }
+.pp8  { right: 18%; top: 89%; width: clamp(44px, 5vw, 78px);   aspect-ratio: 1; opacity: .6;  animation-duration: 18s; animation-delay: -11s; }
+.pp9  { left: 27%; top: 3%;  width: clamp(38px, 4.2vw, 64px);  aspect-ratio: 1; opacity: .48; filter: blur(1px); animation-duration: 22s; animation-delay: -5s; }
+.pp10 { right: 28%; top: 4%; width: clamp(48px, 5.6vw, 90px);  aspect-ratio: 1; opacity: .62; animation-duration: 16s; animation-delay: -13s; }
+
+/* Карточка игры всегда поверх декора */
+#app {
+  z-index: 1;
+}
+
+/* Узкие экраны: кружочки у самой карточки прячем, чтобы не толпились */
+@media (max-width: 1040px) {
+  .pp4, .pp8, .pp9, .pp10 {
+    display: none;
+  }
+}
+
+/* На телефоне карточка занимает весь экран — декор не нужен */
+@media (max-width: 560px) {
+  #page-photos {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp {
+    animation: none;
+  }
+}
+
+/* ===== ПАУЗА ===== */
+#pause-btn {
+  position: absolute;
+  top: 14px;
+  right: 52px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.18s ease;
+}
+
+#pause-btn:hover {
+  background: rgba(168, 85, 247, 0.5);
+}
+
+/* Оверлей внутри игрового экрана: канвас остаётся видимым под блюром */
+#pause-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 9, 18, 0.72);
+  backdrop-filter: blur(12px) saturate(1.15);
+}
+
+#pause-overlay[hidden] {
+  display: none;
+}

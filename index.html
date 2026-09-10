@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Yana Runner — Путешествие по миру</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Декор страницы: фото Яны в кружочках вокруг игры -->
+  <div id="page-photos" aria-hidden="true">
+    <span class="pp pp1"></span>
+    <span class="pp pp2"></span>
+    <span class="pp pp3"></span>
+    <span class="pp pp4"></span>
+    <span class="pp pp5"></span>
+    <span class="pp pp6"></span>
+    <span class="pp pp7"></span>
+    <span class="pp pp8"></span>
+    <span class="pp pp9"></span>
+    <span class="pp pp10"></span>
+  </div>
+
+  <div id="app">
+    <!-- Главное меню -->
+    <div id="menu-screen" class="screen active">
+      <div class="menu-header">
+        <div class="yana-avatar">
+          <img src="assets/yana-photo.png" alt="Yana" id="yana-photo">
+        </div>
+        <h1>Yana Runner</h1>
+        <p class="subtitle">Путешествие по миру 🌍</p>
+      </div>
+
+      <!-- Маршрут проходится строго по порядку, выбирать город нельзя -->
+      <div class="route">
+        <span class="route-step"><i>1</i> 🏔️ Derbent</span>
+        <span class="route-arrow">→</span>
+        <span class="route-step"><i>2</i> 🏛️ Moscow</span>
+        <span class="route-arrow">→</span>
+        <span class="route-step"><i>3</i> 🌴 Tel Aviv</span>
+        <span class="route-arrow">→</span>
+        <span class="route-step"><i>4</i> 🚲 Amsterdam</span>
+      </div>
+
+      <button id="start-btn" class="btn-primary btn-start">Начать путешествие →</button>
+
+      <div class="controls">
+        <p><kbd>Space</kbd> <kbd>↑</kbd> — прыжок, второй раз в воздухе — двойной прыжок</p>
+        <p><kbd>↓</kbd> — присесть под летящими, в воздухе — быстрое падение</p>
+        <p class="controls-meta">🍪 орешки со сгущёнкой · ♥ жизни · 🛡 щит · у Яны 3 жизни</p>
+        <p class="controls-meta">На телефоне: тап сверху — прыжок, тап снизу — присесть · <kbd>P</kbd> — пауза · <kbd>M</kbd> — звук</p>
+      </div>
+    </div>
+
+    <!-- Экран игры -->
+    <div id="game-screen" class="screen">
+      <canvas id="game-canvas"></canvas>
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="hud">
+        <div id="level-label" class="pill"></div>
+        <div id="lives" class="pill"></div>
+        <div id="shield" class="pill" hidden></div>
+        <div id="cookies" class="pill">🍪 0</div>
+        <div id="score" class="pill">0 м</div>
+      </div>
+      <button id="pause-btn" title="Пауза (P)" aria-label="Пауза">⏸</button>
+      <button id="back-btn" title="Меню">✕</button>
+
+      <!-- Пауза лежит поверх канваса, а не отдельным экраном — игра видна сквозь блюр -->
+      <div id="pause-overlay" hidden>
+        <div class="overlay-box">
+          <div class="badge">⏸ Пауза</div>
+          <h2>Яна переводит дух</h2>
+          <p id="pause-stats"></p>
+          <div class="overlay-buttons">
+            <button id="resume-btn" class="btn-primary">Продолжить →</button>
+            <button id="pause-restart-btn" class="btn-secondary">Начать уровень заново</button>
+            <button id="pause-menu-btn" class="btn-secondary">В меню</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Экран победы -->
+    <div id="win-screen" class="screen overlay">
+      <div class="overlay-box">
+        <div class="badge">🎉 Уровень пройден</div>
+        <h2>Город позади!</h2>
+        <p id="win-message"></p>
+        <div class="overlay-buttons">
+          <button id="next-level-btn" class="btn-primary">Следующий уровень →</button>
+          <button id="win-menu-btn" class="btn-secondary">Меню</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Экран проигрыша -->
+    <div id="lose-screen" class="screen overlay">
+      <div class="overlay-box">
+        <div class="badge danger">💥 Забег окончен</div>
+        <h2 id="lose-message">У Яны закончились жизни</h2>
+        <p id="lose-score"></p>
+        <div class="overlay-buttons">
+          <button id="retry-btn" class="btn-primary">Ещё раз</button>
+          <button id="lose-menu-btn" class="btn-secondary">Меню</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Финальный экран -->
+    <div id="final-screen" class="screen overlay">
+      <div class="overlay-box final">
+        <div class="yana-avatar small">
+          <img src="assets/yana-photo.png" alt="Yana">
+        </div>
+        <div class="badge gold">🏆 Маршрут завершён</div>
+        <h2>Поздравляем!</h2>
+        <p>Яна прошла все 4 города<br><b>Derbent → Moscow → Tel Aviv → Amsterdam</b></p>
+        <p id="final-stats"></p>
+        <button id="final-menu-btn" class="btn-primary">В меню</button>
+      </div>
+    </div>
+
+    <!-- Звук доступен на всех экранах -->
+    <button id="sound-btn" title="Звук (M)" aria-label="Звук">🔊</button>
+  </div>
+  <audio id="bgm" src="assets/soundtrack.mp3" loop preload="auto"></audio>
+  <script src="game.js"></script>
+</body>
+</html>
