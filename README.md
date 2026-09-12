@@ -2,7 +2,7 @@
 
 Браузерная раннер-игра: маршрут из четырёх городов, проходится строго по порядку.
 
-**Играть:** https://REPLACE-ME.github.io/yana-runner/
+**Играть:** https://monkate.github.io/yana-runner/
 
 ## Локальный запуск
 
