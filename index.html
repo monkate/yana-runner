@@ -32,18 +32,7 @@
           <img src="assets/yana-photo.png" alt="Yana" id="yana-photo">
         </div>
         <h1>Yana Runner</h1>
-        <p class="subtitle">Путешествие по миру 🌍</p>
-      </div>
-
-      <!-- Маршрут проходится строго по порядку, выбирать город нельзя -->
-      <div class="route">
-        <span class="route-step"><i>1</i> 🏔️ Derbent</span>
-        <span class="route-arrow">→</span>
-        <span class="route-step"><i>2</i> 🏛️ Moscow</span>
-        <span class="route-arrow">→</span>
-        <span class="route-step"><i>3</i> 🌴 Tel Aviv</span>
-        <span class="route-arrow">→</span>
-        <span class="route-step"><i>4</i> 🚲 Amsterdam</span>
+        <p class="subtitle">Путешествие по миру</p>
       </div>
 
       <button id="start-btn" class="btn-primary btn-start">Начать путешествие →</button>
@@ -88,7 +77,7 @@
     <!-- Экран победы -->
     <div id="win-screen" class="screen overlay">
       <div class="overlay-box">
-        <div class="badge">🎉 Уровень пройден</div>
+        <div class="badge">Уровень пройден</div>
         <h2>Город позади!</h2>
         <p id="win-message"></p>
         <div class="overlay-buttons">
@@ -96,12 +85,20 @@
           <button id="win-menu-btn" class="btn-secondary">Меню</button>
         </div>
       </div>
+
+      <!-- Гостья выскакивает после некоторых уровней -->
+      <div id="guest-pop" hidden>
+        <video id="guest-video-nastya" src="assets/nastya-head.webm" muted loop playsinline preload="auto" hidden></video>
+        <video id="guest-video-natasha" src="assets/natasha-head.webm" muted loop playsinline preload="auto" hidden></video>
+        <video id="guest-video-karina" src="assets/karina-head.webm" muted loop playsinline preload="auto" hidden></video>
+        <video id="guest-video-kate" src="assets/kate-head.webm" muted loop playsinline preload="auto" hidden></video>
+      </div>
     </div>
 
     <!-- Экран проигрыша -->
     <div id="lose-screen" class="screen overlay">
       <div class="overlay-box">
-        <div class="badge danger">💥 Забег окончен</div>
+        <div class="badge danger">Забег окончен</div>
         <h2 id="lose-message">У Яны закончились жизни</h2>
         <p id="lose-score"></p>
         <div class="overlay-buttons">
@@ -111,24 +108,21 @@
       </div>
     </div>
 
-    <!-- Финальный экран -->
-    <div id="final-screen" class="screen overlay">
-      <div class="overlay-box final">
-        <div class="yana-avatar small">
-          <img src="assets/yana-photo.png" alt="Yana">
-        </div>
-        <div class="badge gold">🏆 Маршрут завершён</div>
-        <h2>Поздравляем!</h2>
-        <p>Яна прошла все 4 города<br><b>Derbent → Moscow → Tel Aviv → Amsterdam</b></p>
-        <p id="final-stats"></p>
-        <button id="final-menu-btn" class="btn-primary">В меню</button>
-      </div>
+    <!-- Финал: поздравительная гифка во весь экран, вокруг фейерверки -->
+    <div id="final-screen" class="screen">
+      <canvas id="fireworks" aria-hidden="true"></canvas>
+      <video id="final-video" src="assets/happy-birthday.mp4" loop muted playsinline preload="auto"></video>
+      <button id="final-menu-btn">В меню</button>
     </div>
 
     <!-- Звук доступен на всех экранах -->
     <button id="sound-btn" title="Звук (M)" aria-label="Звук">🔊</button>
   </div>
   <audio id="bgm" src="assets/soundtrack.mp3" loop preload="auto"></audio>
+  <audio id="guest-voice-nastya" class="guest-voice" src="assets/nastya-voice.ogg" preload="auto"></audio>
+  <audio id="guest-voice-natasha" class="guest-voice" src="assets/natasha-voice.ogg" preload="auto"></audio>
+  <audio id="guest-voice-karina" class="guest-voice" src="assets/karina-voice.ogg" preload="auto"></audio>
+  <audio id="guest-voice-kate" class="guest-voice" src="assets/kate-voice.ogg" preload="auto"></audio>
   <script src="game.js"></script>
 </body>
 </html>

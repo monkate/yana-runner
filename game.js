@@ -19,7 +19,6 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 const LEVELS = [
   {
     name: 'Derbent',
-    emoji: '🏔️',
     targetDistance: 400,
     skyTop: '#87CEEB',
     skyBottom: '#E8D5A3',
@@ -37,7 +36,6 @@ const LEVELS = [
   },
   {
     name: 'Moscow',
-    emoji: '🏛️',
     targetDistance: 500,
     skyTop: '#7E98BE',
     skyBottom: '#F2DFC2',
@@ -55,7 +53,6 @@ const LEVELS = [
   },
   {
     name: 'Tel Aviv',
-    emoji: '🌴',
     targetDistance: 500,
     skyTop: '#4FC3F7',
     skyBottom: '#FFF9C4',
@@ -73,7 +70,6 @@ const LEVELS = [
   },
   {
     name: 'Amsterdam',
-    emoji: '🚲',
     targetDistance: 600,
     skyTop: '#90CAF9',
     skyBottom: '#E3F2FD',
@@ -1830,7 +1826,7 @@ function updateHUD() {
   const m = multiplier();
 
   setText(hud.levelLabel, 'label',
-    (state.levelIndex + 1) + '/' + LEVELS.length + ' ' + level.emoji + ' ' + level.name);
+    (state.levelIndex + 1) + '/' + LEVELS.length + ' ' + level.name);
   setText(hud.cookies, 'cookies', '🍪 ' + state.cookies + (m > 1 ? ' x' + m : ''));
   setText(hud.score, 'score', Math.floor(state.distance) + ' м');
 
@@ -1888,10 +1884,12 @@ function togglePause() {
 //  УПРАВЛЕНИЕ ЭКРАНАМИ
 // ============================================================
 function showScreen(id) {
+  if (id !== 'win-screen') hideGuest();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   state.screen = id;
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  if (id === 'final-screen') startFinal(); else stopFinal();
   updateMusic();
 }
 
@@ -1940,8 +1938,6 @@ function goNextLevel() {
 }
 
 function showFinal() {
-  document.getElementById('final-stats').textContent =
-    'Собрано 🍪 ' + state.totalCookies + ' · очков ' + state.totalScore;
   showScreen('final-screen');
 }
 
@@ -1967,18 +1963,20 @@ function endGame(won) {
   state.totalCookies += state.cookies;
   state.totalScore += state.score;
 
-  if (state.levelIndex >= LEVELS.length - 1) {
-    showFinal();
-    return;
-  }
-
-  const next = LEVELS[state.levelIndex + 1];
+  // Последний город тоже показывает экран победы — там Катя, а кнопка ведёт в финал
+  const last = state.levelIndex >= LEVELS.length - 1;
+  const next = last ? null : LEVELS[state.levelIndex + 1];
+  // Итог всего забега показываем на последнем экране победы:
+  // финал занят гифкой, там для цифр места нет
   document.getElementById('win-message').textContent =
-    level.emoji + ' ' + level.name + ' — ' + Math.floor(state.distance) + ' м · 🍪 ' +
-    state.cookies + ' · ' + state.score + ' очков (+' + bonus + ' за ♥)';
+    level.name + ' — ' + Math.floor(state.distance) + ' м · 🍪 ' +
+    state.cookies + ' · ' + state.score + ' очков (+' + bonus + ' за ♥)' +
+    (last ? ' · за всё путешествие: 🍪 ' + state.totalCookies + ' · ' + state.totalScore + ' очков' : '');
   document.getElementById('next-level-btn').textContent =
-    'Дальше: ' + next.emoji + ' ' + next.name + ' →';
+    last ? 'Финал →' : 'Дальше: ' + next.name + ' →';
   showScreen('win-screen');
+  // После каждого города гостья выскакивает поздравить
+  showGuest(state.levelIndex);
 }
 
 // ============================================================
@@ -2066,6 +2064,7 @@ canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: fals
 const bgm = document.getElementById('bgm');
 const soundBtn = document.getElementById('sound-btn');
 let muted = false;
+let musicDuck = 1;   // 1 — обычная громкость; меньше — музыка уходит на задний план
 try { muted = localStorage.getItem('yana-muted') === '1'; } catch (err) { muted = false; }
 
 function syncSoundUI() {
@@ -2081,9 +2080,10 @@ function updateMusic() {
     !muted &&
     !document.hidden &&
     !state.paused &&
-    (state.screen === 'game-screen' || state.screen === 'win-screen');
+    (state.screen === 'game-screen' || state.screen === 'win-screen' ||
+     state.screen === 'final-screen');
   if (shouldPlay) {
-    bgm.volume = 0.4;
+    bgm.volume = 0.4 * musicDuck;
     const p = bgm.play();
     if (p && p.catch) p.catch(() => {});
   } else {
@@ -2096,6 +2096,7 @@ function toggleSound() {
   try { localStorage.setItem('yana-muted', muted ? '1' : '0'); } catch (err) { /* приватный режим */ }
   updateMusic();
   syncSoundUI();
+  syncGuestVoice();
 }
 
 soundBtn.addEventListener('click', (e) => {
@@ -2108,6 +2109,198 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('blur', () => setPaused(true));
 syncSoundUI();
+
+// ============================================================
+//  ГОСТЬИ
+//  После некоторых уровней снизу выпрыгивает говорящая голова
+//  с голосовым. Видео — WebM с альфа-каналом, звук отдельным
+//  <audio>: он может быть длиннее ролика, поэтому видео крутится
+//  в цикле, а прячем голову по концу звука.
+// ============================================================
+const GUESTS = {
+  0: 'karina',    // после Дербента
+  1: 'natasha',   // после Москвы
+  2: 'nastya',    // после Тель-Авива
+  3: 'kate',      // после Амстердама
+};
+
+const guestPop = document.getElementById('guest-pop');
+let guestVideo = null;
+let guestVoice = null;
+let guestHideTimer = 0;
+
+function showGuest(levelIndex) {
+  const id = GUESTS[levelIndex];
+  if (!guestPop || !id) return;
+
+  const video = document.getElementById('guest-video-' + id);
+  const voice = document.getElementById('guest-voice-' + id);
+  if (!video || !voice) return;
+
+  clearTimeout(guestHideTimer);
+  guestVideo = video;
+  guestVoice = voice;
+
+  // В контейнере лежат ролики всех гостей — оставляем видимым только нужный
+  guestPop.querySelectorAll('video').forEach(v => {
+    v.hidden = v !== video;
+    if (v !== video) v.pause();
+  });
+
+  guestPop.hidden = false;
+  // Сброс анимации: без reflow повторный показ не перезапустит keyframes
+  guestPop.classList.remove('in', 'out');
+  void guestPop.offsetWidth;
+  guestPop.classList.add('in');
+
+  video.currentTime = 0;
+  const p = video.play();
+  if (p && p.catch) p.catch(() => {});
+
+  voice.currentTime = 0;
+  musicDuck = 0.22;
+  updateMusic();
+  syncGuestVoice();
+}
+
+function hideGuest() {
+  if (!guestPop || guestPop.hidden) return;
+  clearTimeout(guestHideTimer);
+  guestPop.classList.remove('in');
+  guestPop.classList.add('out');
+  guestHideTimer = setTimeout(() => {
+    guestPop.hidden = true;
+    guestPop.classList.remove('out');
+    if (guestVideo) guestVideo.pause();
+  }, 360);
+
+  if (guestVoice) {
+    guestVoice.pause();
+    guestVoice.currentTime = 0;
+  }
+  musicDuck = 1;
+  updateMusic();
+}
+
+// Голос подчиняется общей кнопке звука: мьют глушит, возврат — продолжает
+function syncGuestVoice() {
+  if (!guestVoice || !guestPop || guestPop.hidden) return;
+  if (muted) {
+    guestVoice.pause();
+  } else {
+    const p = guestVoice.play();
+    if (p && p.catch) p.catch(() => {});
+  }
+}
+
+document.querySelectorAll('audio.guest-voice').forEach(a => {
+  a.addEventListener('ended', hideGuest);
+});
+
+// ============================================================
+//  ФИНАЛ
+//  Поздравительная гифка во весь экран, вокруг — цветной фон (в CSS)
+//  и фейерверки на отдельном канвасе. Залпы уходят по краям, чтобы
+//  не лезть на гифку в центре.
+// ============================================================
+const fwCanvas = document.getElementById('fireworks');
+const fwCtx = fwCanvas ? fwCanvas.getContext('2d') : null;
+const finalVideo = document.getElementById('final-video');
+const FW_COLORS = ['#FF3FA4', '#FFC01E', '#22D3EE', '#7B2FF7', '#FF4D6D', '#8CFF4D', '#FFFFFF'];
+let fwParticles = [];
+let fwTimer = 0;
+let fwRunning = false;
+
+function fwResize() {
+  if (!fwCtx) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  fwCanvas.width = Math.round((fwCanvas.clientWidth || 900) * dpr);
+  fwCanvas.height = Math.round((fwCanvas.clientHeight || 600) * dpr);
+  fwCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function fwBurst(x, y) {
+  const color = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+  const count = 34 + Math.floor(Math.random() * 20);
+  const power = 2.2 + Math.random() * 2.2;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.2;
+    const speed = power * (0.55 + Math.random() * 0.75);
+    fwParticles.push({
+      x: x, y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      age: 0,
+      life: 52 + Math.random() * 28,
+      color: color,
+    });
+  }
+}
+
+function fwFrame() {
+  if (!fwRunning) return;
+  requestAnimationFrame(fwFrame);
+
+  const w = fwCanvas.clientWidth;
+  const h = fwCanvas.clientHeight;
+  fwCtx.clearRect(0, 0, w, h);
+  // Искры складываются по свету — пересечения вспыхивают ярче
+  fwCtx.globalCompositeOperation = 'lighter';
+
+  if (--fwTimer <= 0) {
+    fwTimer = 10 + Math.floor(Math.random() * 14);
+    // Гифка квадратная и занимает всю высоту, так что свободны только
+    // полосы по бокам — туда и целимся
+    const strip = Math.max(60, (w - h) / 2);
+    const x = Math.random() < 0.5 ? Math.random() * strip : w - Math.random() * strip;
+    fwBurst(x, h * (0.08 + Math.random() * 0.68));
+  }
+
+  for (let i = fwParticles.length - 1; i >= 0; i--) {
+    const p = fwParticles[i];
+    p.age++;
+    if (p.age >= p.life) {
+      fwParticles.splice(i, 1);
+      continue;
+    }
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.045;        // притяжение тянет искры вниз
+    p.vx *= 0.985;
+    p.vy *= 0.985;
+    fwCtx.globalAlpha = 1 - p.age / p.life;
+    fwCtx.fillStyle = p.color;
+    fwCtx.fillRect(p.x - 2, p.y - 2, 4, 4);
+  }
+  fwCtx.globalAlpha = 1;
+  fwCtx.globalCompositeOperation = 'source-over';
+}
+
+function startFinal() {
+  if (finalVideo) {
+    finalVideo.currentTime = 0;
+    const p = finalVideo.play();
+    if (p && p.catch) p.catch(() => {});
+  }
+  if (!fwCtx || fwRunning) return;
+  fwResize();
+  fwParticles = [];
+  fwTimer = 0;
+  fwRunning = true;
+  requestAnimationFrame(fwFrame);
+}
+
+function stopFinal() {
+  if (finalVideo) finalVideo.pause();
+  if (!fwCtx) return;
+  fwRunning = false;
+  fwParticles = [];
+  fwCtx.clearRect(0, 0, fwCanvas.clientWidth, fwCanvas.clientHeight);
+}
+
+window.addEventListener('resize', () => {
+  if (fwRunning) fwResize();
+});
 
 // Старт
 resizeCanvas();

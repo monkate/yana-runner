@@ -1,6 +1,8 @@
 :root {
   --bg-0: #060912;
   --bg-1: #0E1424;
+  --bg-page: #FFD166;
+  --bg-menu: #1F1809;
   --surface: rgba(255, 255, 255, 0.055);
   --surface-hi: rgba(255, 255, 255, 0.1);
   --stroke: rgba(255, 255, 255, 0.1);
@@ -31,10 +33,7 @@ body {
   justify-content: center;
   font-family: var(--font);
   color: var(--text);
-  background:
-    radial-gradient(900px 620px at 15% -12%, #22305A 0%, transparent 62%),
-    radial-gradient(760px 560px at 105% 108%, #3E1B52 0%, transparent 58%),
-    var(--bg-0);
+  background: var(--bg-page);
 }
 
 #app {
@@ -46,7 +45,7 @@ body {
   overflow: hidden;
   border-radius: 24px;
   border: 1px solid var(--stroke);
-  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  background: var(--bg-1);
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -69,9 +68,7 @@ body {
 #menu-screen {
   padding: 28px 24px;
   gap: 22px;
-  background:
-    radial-gradient(620px 380px at 50% -8%, rgba(168, 85, 247, 0.18) 0%, transparent 70%),
-    radial-gradient(520px 340px at 50% 110%, rgba(255, 77, 109, 0.14) 0%, transparent 70%);
+  background: var(--bg-menu);
 }
 
 .menu-header {
@@ -86,12 +83,6 @@ body {
   margin: 0 auto 16px;
   background: var(--grad);
   box-shadow: 0 12px 34px rgba(168, 85, 247, 0.35);
-}
-
-.yana-avatar.small {
-  width: 68px;
-  height: 68px;
-  margin-bottom: 14px;
 }
 
 .yana-avatar img {
@@ -121,46 +112,6 @@ body {
   color: var(--muted);
   font-size: 15px;
   font-weight: 500;
-}
-
-.route {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  max-width: 680px;
-}
-
-.route-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px 7px 7px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--stroke);
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.route-step i {
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--grad);
-  color: #fff;
-  font-style: normal;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.route-arrow {
-  color: rgba(255, 255, 255, 0.22);
-  font-size: 14px;
 }
 
 /* ===== КНОПКИ ===== */
@@ -202,9 +153,12 @@ body {
   color: var(--text);
 }
 
+/* Единственная кнопка на начальном экране — делаем её крупной */
 .btn-start {
-  font-size: 16px;
-  padding: 15px 34px;
+  font-size: clamp(18px, 3.4vw, 23px);
+  padding: 20px 52px;
+  border-radius: 18px;
+  letter-spacing: -0.01em;
 }
 
 .controls {
@@ -388,12 +342,6 @@ kbd {
   color: #FFB3C1;
 }
 
-.badge.gold {
-  background: rgba(255, 209, 102, 0.14);
-  border-color: rgba(255, 209, 102, 0.42);
-  color: var(--gold);
-}
-
 .overlay-box h2 {
   font-family: var(--display);
   font-weight: 700;
@@ -412,11 +360,6 @@ kbd {
   font-size: 14.5px;
   line-height: 1.7;
   margin-bottom: 20px;
-}
-
-.overlay-box p b {
-  color: var(--text);
-  font-weight: 600;
 }
 
 #final-stats {
@@ -448,19 +391,6 @@ kbd {
     width: 74px;
     height: 74px;
     margin-bottom: 12px;
-  }
-
-  .route {
-    gap: 6px;
-  }
-
-  .route-step {
-    font-size: 12px;
-    padding: 6px 11px 6px 6px;
-  }
-
-  .route-arrow {
-    display: none;
   }
 
   .controls {
@@ -610,4 +540,135 @@ kbd {
 
 #pause-overlay[hidden] {
   display: none;
+}
+
+/* ===== ГОСТЬЯ: голова выскакивает после уровня ===== */
+#guest-pop {
+  position: absolute;
+  left: 14px;
+  bottom: 0;
+  z-index: 40;
+  width: 250px;
+  max-width: 38%;
+  /* Все ролики сведены к одному холсту 520x430, где голова одного
+     размера, — поэтому на экране гостьи выглядят одинаково */
+  aspect-ratio: 520 / 430;
+  /* Стартовая позиция — за нижним краем: голова выпрыгивает снизу */
+  transform: translateY(105%);
+  pointer-events: none;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.55));
+}
+
+#guest-pop video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* В контейнере лежат ролики всех гостей — показываем только нужный */
+#guest-pop video[hidden] {
+  display: none;
+}
+
+#guest-pop.in {
+  animation: guest-in 0.62s cubic-bezier(0.18, 0.9, 0.24, 1.3) forwards;
+}
+
+#guest-pop.out {
+  animation: guest-out 0.36s ease-in forwards;
+}
+
+@keyframes guest-in {
+  0%   { transform: translateY(105%) rotate(8deg); }
+  60%  { transform: translateY(-8%) rotate(-4deg); }
+  82%  { transform: translateY(4%) rotate(2deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes guest-out {
+  from { transform: translateY(0) rotate(0deg); }
+  to   { transform: translateY(105%) rotate(6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #guest-pop.in,
+  #guest-pop.out {
+    animation-duration: 0.01s;
+  }
+}
+
+/* ===== ФИНАЛ: поздравительная гифка во весь экран ===== */
+#final-screen {
+  padding: 0;
+  overflow: hidden;
+  background: #2B0B3F;
+}
+
+/* Цветной фон крутится отдельным слоем: будь анимация на самом экране,
+   она тащила бы за собой и гифку с фейерверками */
+#final-screen::before {
+  content: '';
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(38% 38% at 20% 22%, #FF3FA4 0%, transparent 70%),
+    radial-gradient(36% 36% at 80% 20%, #FFC01E 0%, transparent 70%),
+    radial-gradient(40% 40% at 78% 80%, #7B2FF7 0%, transparent 70%),
+    radial-gradient(34% 34% at 22% 82%, #22D3EE 0%, transparent 70%),
+    radial-gradient(52% 52% at 50% 50%, #FF4D6D 0%, transparent 74%);
+  animation: final-swirl 24s linear infinite;
+}
+
+@keyframes final-swirl {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+#fireworks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#final-video {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* drop-shadow идёт по самой картинке, а не по коробке элемента */
+  filter: drop-shadow(0 18px 46px rgba(0, 0, 0, 0.5));
+}
+
+#final-menu-btn {
+  position: absolute;
+  z-index: 3;
+  left: 14px;
+  top: 14px;
+  padding: 9px 17px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(8, 12, 22, 0.5);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+#final-menu-btn:hover {
+  background: rgba(8, 12, 22, 0.78);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #final-screen::before {
+    animation: none;
+  }
 }
