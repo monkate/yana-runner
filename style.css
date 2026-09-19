@@ -559,7 +559,7 @@ kbd {
   filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.55));
 }
 
-#guest-pop video {
+#guest-pop img {
   display: block;
   width: 100%;
   height: 100%;
@@ -568,7 +568,7 @@ kbd {
 }
 
 /* В контейнере лежат ролики всех гостей — показываем только нужный */
-#guest-pop video[hidden] {
+#guest-pop img[hidden] {
   display: none;
 }
 

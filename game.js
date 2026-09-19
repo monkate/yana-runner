@@ -1929,6 +1929,7 @@ function startLevel(index) {
   resetPlayer();
   initBgElements(LEVELS[index].bgElements);
   updateHUD();
+  preloadGuest(index);
 }
 
 function goNextLevel() {
@@ -2112,10 +2113,11 @@ syncSoundUI();
 
 // ============================================================
 //  ГОСТЬИ
-//  После некоторых уровней снизу выпрыгивает говорящая голова
-//  с голосовым. Видео — WebM с альфа-каналом, звук отдельным
-//  <audio>: он может быть длиннее ролика, поэтому видео крутится
-//  в цикле, а прячем голову по концу звука.
+//  После каждого города снизу выпрыгивает говорящая голова с голосовым.
+//  Ролик — анимированный WebP: в отличие от WebM с альфа-каналом его
+//  прозрачность понимает и Safari. Звук отдельным <audio>, он может быть
+//  длиннее ролика, поэтому WebP крутится в цикле, а голову прячем по
+//  концу звука.
 // ============================================================
 const GUESTS = {
   0: 'karina',    // после Дербента
@@ -2125,26 +2127,33 @@ const GUESTS = {
 };
 
 const guestPop = document.getElementById('guest-pop');
-let guestVideo = null;
 let guestVoice = null;
 let guestHideTimer = 0;
+
+// Ролик весит около мегабайта, поэтому подтягиваем его заранее — пока идёт
+// уровень, а не в тот момент, когда гостья должна выпрыгнуть
+function preloadGuest(levelIndex) {
+  const id = GUESTS[levelIndex];
+  if (!id) return;
+  const clip = document.getElementById('guest-clip-' + id);
+  if (clip && !clip.getAttribute('src')) clip.src = clip.dataset.src;
+}
 
 function showGuest(levelIndex) {
   const id = GUESTS[levelIndex];
   if (!guestPop || !id) return;
 
-  const video = document.getElementById('guest-video-' + id);
+  const clip = document.getElementById('guest-clip-' + id);
   const voice = document.getElementById('guest-voice-' + id);
-  if (!video || !voice) return;
+  if (!clip || !voice) return;
 
   clearTimeout(guestHideTimer);
-  guestVideo = video;
   guestVoice = voice;
+  preloadGuest(levelIndex);
 
   // В контейнере лежат ролики всех гостей — оставляем видимым только нужный
-  guestPop.querySelectorAll('video').forEach(v => {
-    v.hidden = v !== video;
-    if (v !== video) v.pause();
+  guestPop.querySelectorAll('img').forEach(el => {
+    el.hidden = el !== clip;
   });
 
   guestPop.hidden = false;
@@ -2152,10 +2161,6 @@ function showGuest(levelIndex) {
   guestPop.classList.remove('in', 'out');
   void guestPop.offsetWidth;
   guestPop.classList.add('in');
-
-  video.currentTime = 0;
-  const p = video.play();
-  if (p && p.catch) p.catch(() => {});
 
   voice.currentTime = 0;
   musicDuck = 0.22;
@@ -2171,7 +2176,6 @@ function hideGuest() {
   guestHideTimer = setTimeout(() => {
     guestPop.hidden = true;
     guestPop.classList.remove('out');
-    if (guestVideo) guestVideo.pause();
   }, 360);
 
   if (guestVoice) {
