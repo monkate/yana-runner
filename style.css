@@ -242,6 +242,7 @@ kbd {
   border-radius: 999px;
   background: rgba(8, 12, 22, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   font-size: 12px;
   font-weight: 700;
@@ -291,6 +292,7 @@ kbd {
   justify-content: center;
   background: rgba(8, 12, 22, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #fff;
   font-size: 13px;
@@ -306,6 +308,7 @@ kbd {
 /* ===== ОВЕРЛЕИ ===== */
 .overlay {
   background: rgba(6, 9, 18, 0.72);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
   backdrop-filter: blur(12px) saturate(1.15);
   z-index: 20;
 }
@@ -419,6 +422,7 @@ kbd {
   justify-content: center;
   background: rgba(8, 12, 22, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #fff;
   font-size: 15px;
@@ -513,6 +517,7 @@ kbd {
   justify-content: center;
   background: rgba(8, 12, 22, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #fff;
   font-size: 12px;
@@ -535,6 +540,7 @@ kbd {
   align-items: center;
   justify-content: center;
   background: rgba(6, 9, 18, 0.72);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
   backdrop-filter: blur(12px) saturate(1.15);
 }
 
@@ -654,6 +660,7 @@ kbd {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   background: rgba(8, 12, 22, 0.5);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   color: #fff;
   font-family: var(--font);

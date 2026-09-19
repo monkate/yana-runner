@@ -2061,6 +2061,7 @@ canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: fals
 //  ЗВУК
 //  Браузер не даёт стартовать музыку до первого действия пользователя,
 //  поэтому запускаем её по первому клику/нажатию клавиши.
+//  Все файлы — MP3: Opus в контейнере Ogg не понимает Safari.
 // ============================================================
 const bgm = document.getElementById('bgm');
 const soundBtn = document.getElementById('sound-btn');
@@ -2110,6 +2111,28 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('blur', () => setPaused(true));
 syncSoundUI();
+
+// iOS не даёт запустить <audio> программно, если этот элемент ни разу не играл
+// по жесту пользователя. Голосовые включаются сами, в конце уровня, поэтому
+// прогреваем их все разом на первом касании — беззвучно и сразу на паузу.
+let audioUnlocked = false;
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  document.querySelectorAll('audio.guest-voice').forEach(a => {
+    a.muted = true;
+    const done = () => {
+      a.pause();
+      a.currentTime = 0;
+      a.muted = false;
+    };
+    const p = a.play();
+    if (p && p.then) p.then(done).catch(() => { a.muted = false; });
+    else done();
+  });
+}
+document.addEventListener('pointerdown', unlockAudio, { once: true });
+document.addEventListener('keydown', unlockAudio, { once: true });
 
 // ============================================================
 //  ГОСТЬИ
